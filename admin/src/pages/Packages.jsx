@@ -34,7 +34,7 @@ export default function Packages() {
     setLoading(true);
     try {
       // 1. Fetch Subscription Packages
-      const pkgRes = await api.get('/super-admin/packages');
+      const pkgRes = await api.get('/payment/public-packages').catch(() => api.get('/super-admin/packages'));
       if (pkgRes.data.success) {
         setPackages(pkgRes.data.data);
       }

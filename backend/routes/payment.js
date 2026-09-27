@@ -12,6 +12,19 @@ const OPAY_BUSINESS_TOKEN = process.env.OPAY_BUSINESS_TOKEN || '4e6e3b608649c71c
 const OPAY_BUSINESS_API_URL = process.env.OPAY_BUSINESS_API_URL || 'https://api.oraclepay.org/api/opay-business/generate-payment-page';
 
 /**
+ * GET /api/payment/public-packages
+ * Public / Protected for Merchants: List all active subscription packages available for purchase
+ */
+router.get('/public-packages', async (req, res) => {
+  try {
+    const packages = await SubscriptionPackage.find({ active: true }).sort({ price: 1 });
+    return res.json({ success: true, data: packages });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
  * POST /api/payment/purchase-package
  * Protected: Merchant initiates package purchase via OraclePay Business Gateway
  */

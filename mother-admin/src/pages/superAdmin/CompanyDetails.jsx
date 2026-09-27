@@ -12,6 +12,11 @@ import {
   Sparkles, 
   CreditCard,
   History,
+  Edit3,
+  Trash2,
+  Key,
+  X,
+  CheckCircle2,
   ShieldAlert
 } from 'lucide-react';
 
@@ -20,10 +25,23 @@ export default function CompanyDetails() {
   const navigate = useNavigate();
 
   const [details, setDetails] = useState(null);
+  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const [editData, setEditData] = useState({
+    name: '',
+    companyName: '',
+    email: '',
+    phone: '',
+    password: '',
+    packageId: '',
+    status: 'active',
+  });
 
   useEffect(() => {
     fetchCompanyDetails();
+    fetchPackages();
   }, [id]);
 
   const fetchCompanyDetails = async () => {
@@ -32,11 +50,68 @@ export default function CompanyDetails() {
       const res = await API.get(`/super-admin/companies/${id}`);
       if (res.data.success) {
         setDetails(res.data.data);
+        const comp = res.data.data.company;
+        const sub = res.data.data.subscription;
+        setEditData({
+          name: comp.name || '',
+          companyName: comp.companyName || '',
+          email: comp.email || '',
+          phone: comp.phone || '',
+          password: '',
+          packageId: sub?.package?._id || '',
+          status: comp.status || 'active',
+        });
       }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPackages = async () => {
+    try {
+      const res = await API.get('/super-admin/packages');
+      if (res.data.success) setPackages(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await API.put(`/super-admin/companies/${id}`, editData);
+      setEditModalOpen(false);
+      alert('Company details & package updated successfully');
+      fetchCompanyDetails();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error updating details');
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    const currentStatus = details?.company?.status;
+    const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    try {
+      await API.patch(`/super-admin/companies/${id}/status`, { status: newStatus });
+      alert(`Company status changed to ${newStatus}`);
+      fetchCompanyDetails();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE merchant company "${details?.company?.companyName}"? This action cannot be undone.`);
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`/super-admin/companies/${id}`);
+      alert('Company account and all resources deleted successfully');
+      navigate('/super-admin/companies');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete company');
     }
   };
 
@@ -57,24 +132,67 @@ export default function CompanyDetails() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/super-admin/companies')}
-          className="p-2.5 rounded-2xl bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/30 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/super-admin/companies')}
+            className="p-2.5 rounded-2xl bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/30 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
 
-        <div>
-          <h2 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
-            <Building2 className="w-7 h-7 text-fancyPink" />
-            {company.companyName || 'Merchant Details'}
-          </h2>
-          <p className="text-xs text-purple-200/70 mt-0.5">
-            Owner: <strong className="text-white">{company.name}</strong> ({company.email})
-          </p>
+          <div>
+            <h2 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
+              <Building2 className="w-7 h-7 text-fancyPink" />
+              {company.companyName || 'Merchant Details'}
+            </h2>
+            <p className="text-xs text-purple-200/70 mt-0.5">
+              Owner: <strong className="text-white">{company.name}</strong> ({company.email})
+            </p>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setEditModalOpen(true)}
+            className="px-4 py-2.5 rounded-2xl btn-fancy-pink text-white text-xs font-extrabold shadow-lg flex items-center gap-2"
+          >
+            <Edit3 className="w-4 h-4" /> Edit Details & Package
+          </button>
+
+          <button
+            onClick={handleToggleStatus}
+            className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold border ${
+              company.status === 'active'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+            }`}
+          >
+            {company.status === 'active' ? 'Suspend Account' : 'Activate Account'}
+          </button>
+
+          <button
+            onClick={handleDeleteUser}
+            className="px-4 py-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-extrabold shadow-lg flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" /> Delete Account
+          </button>
         </div>
       </div>
+
+      {/* Account Suspended Alert Banner if Suspended */}
+      {company.status === 'suspended' && (
+        <div className="p-5 rounded-3xl bg-rose-500/20 border-2 border-rose-500 text-rose-200 flex items-center gap-4 shadow-2xl">
+          <ShieldAlert className="w-8 h-8 text-rose-400 shrink-0" />
+          <div>
+            <h4 className="text-lg font-extrabold text-rose-300 uppercase tracking-wide">ACCOUNT SUSPENDED BY SUPER ADMIN</h4>
+            <p className="text-xs text-rose-200/90 mt-0.5 font-medium">
+              This merchant user is currently suspended. Access to their merchant dashboard is blocked.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -188,6 +306,122 @@ export default function CompanyDetails() {
           </div>
         )}
       </div>
+
+      {/* Edit Details & Package Modal */}
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fancy-container w-full max-w-lg p-6 md:p-8 rounded-3xl border border-purple-500/30 relative">
+            <button
+              onClick={() => setEditModalOpen(false)}
+              className="absolute right-4 top-4 text-purple-300 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+              <Edit3 className="w-5 h-5 text-fancyPink" /> Edit Company Owner & Subscription Package
+            </h3>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider">Company Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editData.companyName}
+                    onChange={(e) => setEditData({ ...editData, companyName: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink"
+                  />
+                </div>
+                <div>
+                  <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider">Owner Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editData.name}
+                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={editData.email}
+                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink"
+                  />
+                </div>
+                <div>
+                  <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editData.phone}
+                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider">
+                  Assign / Change Package
+                </label>
+                <select
+                  value={editData.packageId}
+                  onChange={(e) => setEditData({ ...editData, packageId: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink"
+                >
+                  <option value="">-- Select Package --</option>
+                  {packages.map((pkg) => (
+                    <option key={pkg._id} value={pkg._id}>
+                      {pkg.title} ({pkg.durationMonths}mo - ৳{pkg.price})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-purple-200 font-bold mb-1 uppercase tracking-wider flex items-center justify-between">
+                  <span>Change Password</span>
+                  <span className="text-[10px] text-purple-400 font-normal">Leave blank if unchanged</span>
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-purple-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    placeholder="Enter new password (min 6 chars)"
+                    value={editData.password}
+                    onChange={(e) => setEditData({ ...editData, password: e.target.value })}
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-2xl bg-[#180f33] border border-purple-500/30 text-white focus:outline-none focus:border-fancyPink font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-purple-500/20">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl bg-purple-950/60 text-purple-300 border border-purple-500/30 font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 btn-fancy-pink text-white font-extrabold rounded-2xl shadow-lg"
+                >
+                  Save Changes & Package
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

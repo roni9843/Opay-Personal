@@ -425,7 +425,63 @@ router.put('/companies/:id', async (req, res) => {
     }
 
     await company.save();
+
+    // Package update if packageId provided
+    const { packageId } = req.body;
+    if (packageId) {
+      const pkg = await SubscriptionPackage.findById(packageId);
+      if (pkg) {
+        const startDate = new Date();
+        const endDate = new Date(startDate.getTime() + pkg.durationMonths * 30 * 24 * 60 * 60 * 1000);
+        let sub = await UserSubscription.findOne({ companyOwner: company._id });
+        if (sub) {
+          sub.package = pkg._id;
+          sub.startDate = startDate;
+          sub.endDate = endDate;
+          sub.active = true;
+          sub.maxAdminDevicesSnapshot = pkg.maxAdminDevices;
+          sub.maxAgentsSnapshot = pkg.maxAgents;
+          sub.maxDevicesPerAgentSnapshot = pkg.maxDevicesPerAgent;
+          sub.maxDevicesSnapshot = pkg.maxDevices;
+          await sub.save();
+        } else {
+          sub = new UserSubscription({
+            companyOwner: company._id,
+            package: pkg._id,
+            apiKey: UserSubscription.generateApiKey(),
+            startDate,
+            endDate,
+            active: true,
+            maxAdminDevicesSnapshot: pkg.maxAdminDevices,
+            maxAgentsSnapshot: pkg.maxAgents,
+            maxDevicesPerAgentSnapshot: pkg.maxDevicesPerAgent,
+            maxDevicesSnapshot: pkg.maxDevices,
+          });
+          await sub.save();
+        }
+      }
+    }
+
     return res.json({ success: true, message: 'Company profile updated successfully', data: company });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * DELETE /api/super-admin/companies/:id
+ * Delete company owner account and all associated resources
+ */
+router.delete('/companies/:id', async (req, res) => {
+  try {
+    const companyId = req.params.id;
+    await User.findByIdAndDelete(companyId);
+    await User.deleteMany({ companyOwnerId: companyId });
+    await UserSubscription.deleteMany({ companyOwner: companyId });
+    await Device.deleteMany({ ownerCompany: companyId });
+    await SubscriptionPurchase.deleteMany({ companyOwner: companyId });
+
+    return res.json({ success: true, message: 'Company account deleted successfully' });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

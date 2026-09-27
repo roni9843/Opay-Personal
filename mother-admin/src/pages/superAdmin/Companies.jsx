@@ -221,17 +221,10 @@ export default function Companies() {
                       <td className="py-4 px-5 text-right space-x-2">
                         <button
                           onClick={() => navigate(`/super-admin/companies/${comp._id}`)}
-                          className="px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-500/30 font-bold"
-                          title="View Full Details"
+                          className="px-3.5 py-1.5 rounded-xl btn-fancy-pink text-white font-bold text-xs shadow-md"
+                          title="View Full Details & Edit"
                         >
-                          <Eye className="w-3.5 h-3.5 inline mr-1" /> View
-                        </button>
-                        <button
-                          onClick={() => openEditModal(comp)}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-200 border border-indigo-500/30 font-bold"
-                          title="Edit Details & Password"
-                        >
-                          <Edit3 className="w-3.5 h-3.5 inline mr-1" /> Edit
+                          <Eye className="w-3.5 h-3.5 inline mr-1" /> View & Edit
                         </button>
                         <button
                           onClick={() => handleToggleStatus(comp._id, comp.status)}
