@@ -163,24 +163,37 @@ export default function Packages() {
                   </div>
 
                   {/* Limits Breakdown */}
-                  <div className="my-5 p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs text-slate-300">
-                    <div className="flex justify-between items-center">
-                      <span>Admin Devices:</span>
-                      <strong className="text-emerald-400 font-semibold">{pkg.maxAdminDevices || 1} Devices</strong>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Staff Agents:</span>
-                      <strong className="text-purple-400 font-semibold">{pkg.maxAgents || 1} Agents</strong>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Devices per Agent:</span>
-                      <strong className="text-cyan-400 font-semibold">{pkg.maxDevicesPerAgent || 1} Device/Agent</strong>
-                    </div>
-                    <div className="flex justify-between items-center pt-1.5 border-t border-white/10 font-bold">
-                      <span className="text-slate-400">Total SIM Capacity:</span>
-                      <span className="text-fancyPink">{pkg.maxDevices || 3} SIMs</span>
-                    </div>
-                  </div>
+                  {(() => {
+                    const adminDevs = pkg.maxAdminDevices || 1;
+                    const agentCount = pkg.maxAgents || 1;
+                    const devsPerAgent = pkg.maxDevicesPerAgent || 1;
+                    const totalDevices = adminDevs + agentCount * devsPerAgent;
+                    const totalSimCapacity = totalDevices * 2;
+                    return (
+                      <div className="my-5 p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs text-slate-300">
+                        <div className="flex justify-between items-center">
+                          <span>Admin Devices:</span>
+                          <strong className="text-emerald-400 font-semibold">{adminDevs} Devices</strong>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span>Staff Agents:</span>
+                          <strong className="text-purple-400 font-semibold">{agentCount} Agents</strong>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span>Devices per Agent:</span>
+                          <strong className="text-cyan-400 font-semibold">{devsPerAgent} Device/Agent</strong>
+                        </div>
+                        <div className="flex justify-between items-center pt-1.5 border-t border-white/10 text-[11px]">
+                          <span className="text-slate-400">Total Devices:</span>
+                          <strong className="text-white font-bold">{totalDevices} Devices</strong>
+                        </div>
+                        <div className="flex justify-between items-center font-extrabold text-xs">
+                          <span className="text-slate-300">Total SIM Capacity:</span>
+                          <span className="text-fancyPink font-mono">{totalSimCapacity} SIMs ({totalDevices} × 2)</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {pkg.features && pkg.features.length > 0 && (
                     <ul className="space-y-2 text-xs text-slate-400 mb-6">
