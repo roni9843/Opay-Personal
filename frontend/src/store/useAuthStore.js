@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import API from '../services/api';
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('opay_user')) || null,
@@ -11,7 +11,7 @@ export const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await API.post('/auth/login', { email, password });
       const { token, user } = response.data;
 
       localStorage.setItem('opay_token', token);
@@ -49,9 +49,7 @@ export const useAuthStore = create((set, get) => ({
     if (!token) return;
 
     try {
-      const response = await axios.get('/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await API.get('/auth/me');
       const user = response.data.user;
       localStorage.setItem('opay_user', JSON.stringify(user));
       set({ user, isAuthenticated: true });

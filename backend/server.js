@@ -60,9 +60,20 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use by another process.`);
+    console.error(`💡 Free port ${PORT} or change PORT in .env file.`);
+  } else {
+    console.error('Server Listen Error:', err);
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🚀 Opay-Personal Server running on port ${PORT}`);
   console.log(`🌐 Base API URL: http://localhost:${PORT}/api`);
   console.log(`====================================================`);
 });
+

@@ -27,9 +27,11 @@ export default function PaymentPage() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
   const fetchSession = async () => {
     try {
-      const res = await axios.get(`/api/external/checkout/resolve/${sessionToken}`);
+      const res = await axios.get(`${API_BASE_URL}/external/checkout/resolve/${sessionToken}`);
       setSessionData(res.data.session);
 
       if (res.data.session?.paymentMethods?.length > 0) {
@@ -66,7 +68,7 @@ export default function PaymentPage() {
     setErrorMsg('');
 
     try {
-      const res = await axios.post(`/api/external/checkout/verify/${sessionToken}`, {
+      const res = await axios.post(`${API_BASE_URL}/external/checkout/verify/${sessionToken}`, {
         trxID: trxID.trim(),
         provider: selectedMethod?.provider || 'bkash',
       });
