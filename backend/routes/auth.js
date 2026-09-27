@@ -207,8 +207,33 @@ router.put('/update-profile', protect, async (req, res) => {
       message: 'Profile updated successfully',
       user,
     });
+/**
+ * GET /api/auth/me-status
+ * Public token check: Fetch current user status even if suspended
+ */
+router.get('/me-status', async (req, res) => {
+  try {
+    let token = req.headers.authorization?.split(' ')[1] || req.headers['x-access-token'];
+    if (!token) return res.status(401).json({ success: false, message: 'No token' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    return res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        companyName: user.companyName,
+        status: user.status,
+      },
+    });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(401).json({ success: false, message: 'Invalid token' });
   }
 });
 

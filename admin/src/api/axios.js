@@ -21,11 +21,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('opay_merchant_token');
-      localStorage.removeItem('opay_merchant_user');
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-        window.location.href = '/login';
+    if (error.response) {
+      if (error.response.status === 401) {
+        localStorage.removeItem('opay_merchant_token');
+        localStorage.removeItem('opay_merchant_user');
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          window.location.href = '/login';
+        }
+      } else if (error.response.status === 403) {
+        const storedUser = JSON.parse(localStorage.getItem('opay_merchant_user') || '{}');
+        storedUser.status = 'suspended';
+        localStorage.setItem('opay_merchant_user', JSON.stringify(storedUser));
+        window.dispatchEvent(new Event('opay_user_suspended'));
       }
     }
     return Promise.reject(error);
