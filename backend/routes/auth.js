@@ -94,39 +94,6 @@ router.post(
       });
       await companyUser.save();
 
-      // 2. Assign Default Package Subscription (Starter 1 Month)
-      let pkg = await SubscriptionPackage.findOne({ active: true }).sort({ price: 1 });
-      if (!pkg) {
-        pkg = new SubscriptionPackage({
-          title: 'Starter Pack (1 Month)',
-          durationMonths: 1,
-          regularPrice: 2000,
-          price: 1499,
-          maxAdminDevices: 1,
-          maxAgents: 2,
-          maxDevicesPerAgent: 1,
-          maxDevices: 3,
-        });
-        await pkg.save();
-      }
-
-      const startDate = new Date();
-      const endDate = new Date(startDate.getTime() + pkg.durationMonths * 30 * 24 * 60 * 60 * 1000);
-
-      const subscription = new UserSubscription({
-        companyOwner: companyUser._id,
-        package: pkg._id,
-        apiKey: UserSubscription.generateApiKey(),
-        startDate,
-        endDate,
-        active: true,
-        maxAdminDevicesSnapshot: pkg.maxAdminDevices,
-        maxAgentsSnapshot: pkg.maxAgents,
-        maxDevicesPerAgentSnapshot: pkg.maxDevicesPerAgent,
-        maxDevicesSnapshot: pkg.maxDevices,
-      });
-      await subscription.save();
-
       const token = generateToken(companyUser._id);
 
       return res.status(201).json({

@@ -9,6 +9,8 @@ import Login from './pages/auth/Login';
 import SuperAdminDashboard from './pages/superAdmin/Dashboard';
 import Packages from './pages/superAdmin/Packages';
 import Companies from './pages/superAdmin/Companies';
+import CompanyDetails from './pages/superAdmin/CompanyDetails';
+import PurchasedSubscriptions from './pages/superAdmin/PurchasedSubscriptions';
 import SmsLogs from './pages/superAdmin/SmsLogs';
 
 import CompanyDashboard from './pages/company/Dashboard';
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/packages" element={<Packages />} />
           <Route path="/super-admin/companies" element={<Companies />} />
+          <Route path="/super-admin/companies/:id" element={<CompanyDetails />} />
+          <Route path="/super-admin/purchased-subscriptions" element={<PurchasedSubscriptions />} />
           <Route path="/super-admin/sms-logs" element={<SmsLogs />} />
         </Route>
 

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
+  Package,
   Users, 
   Smartphone, 
   CreditCard, 
@@ -11,10 +12,22 @@ import {
   X,
   Sparkles
 } from 'lucide-react';
+import api from '../../api/axios';
 
 export default function Sidebar({ isOpen, onClose }) {
+  const [subInfo, setSubInfo] = useState(null);
+
+  useEffect(() => {
+    api.get('/company/api-settings')
+      .then((res) => {
+        if (res.data.success) setSubInfo(res.data.data);
+      })
+      .catch(() => setSubInfo(null));
+  }, []);
+
   const menuItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Packages & Plans', path: '/packages', icon: Package },
     { label: 'Staff Agents', path: '/agents', icon: Users },
     { label: 'SIM Devices', path: '/devices', icon: Smartphone },
     { label: 'Payment Numbers', path: '/payment-numbers', icon: CreditCard },
@@ -24,7 +37,7 @@ export default function Sidebar({ isOpen, onClose }) {
   ];
 
   const sidebarContent = (
-    <div className="h-full flex flex-col justify-between p-4 bg-[#180f33]/90 backdrop-blur-2xl border-r border-purple-500/20 shadow-2xl">
+    <div className="h-full flex flex-col justify-between p-4 bg-[#180f33]/90 backdrop-blur-2xl border-r border-purple-500/20 shadow-2xl overflow-y-auto">
       <div>
         {/* Brand Header */}
         <div className="flex items-center justify-between px-3 py-3 mb-6">
@@ -73,12 +86,25 @@ export default function Sidebar({ isOpen, onClose }) {
       </div>
 
       {/* Package Card Notice */}
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-900/40 to-pink-950/40 border border-fancyPink/30 shadow-lg">
-        <div className="flex items-center gap-2 mb-2 text-pink-300 font-bold text-xs uppercase tracking-wider">
-          <Sparkles className="w-4 h-4 text-fancyPink" /> Active Plan
+      <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-900/40 to-pink-950/40 border border-fancyPink/30 shadow-lg mt-4">
+        <div className="flex items-center justify-between mb-2 text-pink-300 font-bold text-xs uppercase tracking-wider">
+          <span className="flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-fancyPink" /> Active Plan
+          </span>
         </div>
-        <p className="text-sm font-extrabold text-white">Starter Pack</p>
-        <p className="text-[11px] text-purple-200/80 mt-1 font-medium">SIM Capacity: 6 Slots (3 Devices)</p>
+        <p className="text-sm font-extrabold text-white">
+          {subInfo?.package?.title || 'No Active Package'}
+        </p>
+        <p className="text-[11px] text-purple-200/80 mt-1 font-medium">
+          {subInfo ? `Valid until: ${new Date(subInfo.endDate).toLocaleDateString()}` : 'Please buy a package to start'}
+        </p>
+        <NavLink
+          to="/packages"
+          onClick={onClose}
+          className="mt-3 block text-center py-2 bg-fancyPink/20 hover:bg-fancyPink/30 text-pink-300 text-xs font-extrabold rounded-xl border border-fancyPink/40 transition-all"
+        >
+          {subInfo ? 'Upgrade / Renew' : 'Buy Package Now'}
+        </NavLink>
       </div>
     </div>
   );

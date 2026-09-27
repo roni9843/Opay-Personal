@@ -27,6 +27,7 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
         { label: 'Mother Overview', path: '/super-admin', icon: LayoutDashboard },
         { label: 'Subscription Packages', path: '/super-admin/packages', icon: Package },
         { label: 'Companies & Owners', path: '/super-admin/companies', icon: Building2 },
+        { label: 'Purchased Subscriptions', path: '/super-admin/purchased-subscriptions', icon: CreditCard },
         { label: 'SMS Gateway Panel', path: '/super-admin/sms-logs', icon: MessageSquare },
       ];
     }

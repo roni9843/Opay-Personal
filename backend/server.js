@@ -44,6 +44,7 @@ app.use('/api/company', require('./routes/company'));
 app.use('/api/agent', require('./routes/agent'));
 app.use('/api/devices', require('./routes/devices'));
 app.use('/api/external', require('./routes/external'));
+app.use('/api/payment', require('./routes/payment'));
 
 // 404 Route
 app.use((req, res) => {

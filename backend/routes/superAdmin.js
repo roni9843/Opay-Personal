@@ -9,6 +9,7 @@ const PaymentMessage = require('../models/PaymentMessage');
 const PaymentSession = require('../models/PaymentSession');
 const SiteSetting = require('../models/SiteSetting');
 const SmsLog = require('../models/SmsLog');
+const SubscriptionPurchase = require('../models/SubscriptionPurchase');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
@@ -363,6 +364,86 @@ router.get('/sms-logs', async (req, res) => {
         pages: Math.ceil(total / limit),
       },
     });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/super-admin/companies/:id
+ * Single Company Details (User, Subscription, Devices, Agents)
+ */
+router.get('/companies/:id', async (req, res) => {
+  try {
+    const company = await User.findById(req.params.id).lean();
+    if (!company || company.role !== 'company_owner') {
+      return res.status(404).json({ success: false, message: 'Company not found' });
+    }
+
+    const subscription = await UserSubscription.findOne({ companyOwner: company._id, active: true })
+      .populate('package')
+      .lean();
+
+    const devices = await Device.find({ ownerCompany: company._id }).sort({ createdAt: -1 });
+    const agents = await User.find({ companyOwnerId: company._id, role: 'agent' }).select('-password');
+    const purchases = await SubscriptionPurchase.find({ companyOwner: company._id }).sort({ createdAt: -1 });
+
+    return res.json({
+      success: true,
+      data: {
+        company,
+        subscription,
+        devices,
+        agents,
+        purchases,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * PUT /api/super-admin/companies/:id
+ * Update company details (Name, Company Name, Email, Phone, Password)
+ */
+router.put('/companies/:id', async (req, res) => {
+  try {
+    const { name, companyName, email, phone, password, status } = req.body;
+    const company = await User.findById(req.params.id);
+    if (!company || company.role !== 'company_owner') {
+      return res.status(404).json({ success: false, message: 'Company not found' });
+    }
+
+    if (name) company.name = name;
+    if (companyName) company.companyName = companyName;
+    if (email) company.email = email.toLowerCase();
+    if (phone) company.phone = phone;
+    if (status) company.status = status;
+    if (password && password.trim().length >= 6) {
+      company.password = password;
+    }
+
+    await company.save();
+    return res.json({ success: true, message: 'Company profile updated successfully', data: company });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/super-admin/purchased-subscriptions
+ * List all subscription purchases made by merchant companies
+ */
+router.get('/purchased-subscriptions', async (req, res) => {
+  try {
+    const purchases = await SubscriptionPurchase.find({})
+      .populate('companyOwner', 'name companyName email phone status')
+      .populate('package', 'title durationMonths price')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.json({ success: true, data: purchases });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout';
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/Dashboard';
+import Packages from './pages/Packages';
 import Agents from './pages/Agents';
 import Devices from './pages/Devices';
 import PaymentNumbers from './pages/PaymentNumbers';
@@ -22,6 +23,7 @@ export default function App() {
         {/* Protected Dashboard Routes */}
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/packages" element={<Packages />} />
           <Route path="/agents" element={<Agents />} />
           <Route path="/devices" element={<Devices />} />
           <Route path="/payment-numbers" element={<PaymentNumbers />} />
