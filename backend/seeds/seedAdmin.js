@@ -23,52 +23,88 @@ const seedAdmin = async () => {
         status: 'active',
       });
       await superAdmin.save();
-      console.log(`✅ Default Mother Super Admin created: ${superAdminEmail} / ${process.env.SUPER_ADMIN_PASS || 'Admin123456!'}`);
+      console.log(`✅ Default Mother Super Admin created: ${superAdminEmail}`);
     } else {
       console.log(`ℹ️ Super Admin already exists: ${superAdminEmail}`);
     }
 
-    // 2. Seed Default Subscription Packages
-    const packageCount = await SubscriptionPackage.countDocuments({});
-    if (packageCount === 0) {
-      const packages = [
-        {
-          title: 'Starter 1 Month',
-          durationMonths: 1,
-          price: 1500,
-          maxDevices: 2,
-          maxAgents: 3,
-          features: ['2 Active SIM Devices', '3 Staff Agents', 'Real-time SMS Match', 'Instant Webhooks'],
-        },
-        {
-          title: 'Growth 3 Months',
-          durationMonths: 3,
-          price: 4000,
-          maxDevices: 5,
-          maxAgents: 8,
-          features: ['5 Active SIM Devices', '8 Staff Agents', 'Priority Webhooks', 'Full Analytics'],
-        },
-        {
-          title: 'Enterprise 6 Months',
-          durationMonths: 6,
-          price: 7500,
-          maxDevices: 12,
-          maxAgents: 20,
-          features: ['12 Active SIM Devices', '20 Staff Agents', 'Unlimited Webhooks', 'Dedicated Support'],
-        },
-        {
-          title: 'Pro Yearly (12 Months)',
-          durationMonths: 12,
-          price: 13500,
-          maxDevices: 30,
-          maxAgents: 50,
-          features: ['30 Active SIM Devices', '50 Staff Agents', 'API Access', 'Enterprise SLA'],
-        },
-      ];
+    // 2. Remove all old packages and re-seed clean new packages
+    await SubscriptionPackage.deleteMany({});
+    console.log('🧹 Old subscription packages removed.');
 
-      await SubscriptionPackage.insertMany(packages);
-      console.log('✅ Default Subscription Packages seeded successfully');
-    }
+    const newPackages = [
+      {
+        title: 'Starter Pack (1 Month)',
+        durationMonths: 1,
+        regularPrice: 2000,
+        price: 1499, // Offer Price
+        maxAdminDevices: 1,
+        maxAgents: 2,
+        maxDevicesPerAgent: 1,
+        maxDevices: 3, // (1 + 2 * 1) = 3 Devices = 6 SIMs
+        features: [
+          '3 Total Devices (6 SIM Capacity)',
+          '1 Admin Device + 2 Staff Agents',
+          'Realtime SMS Match Engine',
+          'Instant Webhook Callbacks',
+          '24/7 Socket Listener',
+        ],
+      },
+      {
+        title: 'Growth Pack (3 Months)',
+        durationMonths: 3,
+        regularPrice: 5500,
+        price: 3999,
+        maxAdminDevices: 2,
+        maxAgents: 5,
+        maxDevicesPerAgent: 2,
+        maxDevices: 12, // (2 + 5 * 2) = 12 Devices = 24 SIMs
+        features: [
+          '12 Total Devices (24 SIM Capacity)',
+          '2 Admin Devices + 5 Staff Agents',
+          'Priority Webhook Dispatcher',
+          'Full Analytics Dashboard',
+          'Dedicated Support',
+        ],
+      },
+      {
+        title: 'Enterprise Pack (6 Months)',
+        durationMonths: 6,
+        regularPrice: 11000,
+        price: 7499,
+        maxAdminDevices: 4,
+        maxAgents: 10,
+        maxDevicesPerAgent: 2,
+        maxDevices: 24, // (4 + 10 * 2) = 24 Devices = 48 SIMs
+        features: [
+          '24 Total Devices (48 SIM Capacity)',
+          '4 Admin Devices + 10 Staff Agents',
+          'High-Speed Webhook Engine',
+          'Custom Gateway Branding',
+          '24/7 VIP Support',
+        ],
+      },
+      {
+        title: 'Pro Yearly (12 Months)',
+        durationMonths: 12,
+        regularPrice: 22000,
+        price: 13999,
+        maxAdminDevices: 10,
+        maxAgents: 25,
+        maxDevicesPerAgent: 2,
+        maxDevices: 60, // (10 + 25 * 2) = 60 Devices = 120 SIMs
+        features: [
+          '60 Total Devices (120 SIM Capacity)',
+          '10 Admin Devices + 25 Staff Agents',
+          'Unlimited API Integration',
+          'Dedicated Server Allocation',
+          'Priority SLA Support',
+        ],
+      },
+    ];
+
+    await SubscriptionPackage.insertMany(newPackages);
+    console.log('✅ New Subscription Packages seeded successfully!');
 
     console.log('[Seed Completed Successfully]');
     process.exit(0);
