@@ -85,9 +85,7 @@ router.post(
   [
     body('title').notEmpty().withMessage('Package title is required'),
     body('durationMonths').isInt({ min: 1 }).withMessage('Duration in months is required'),
-    body('price').isNumeric().withMessage('Price is required'),
-    body('maxDevices').isInt({ min: 1 }).withMessage('Max devices limit is required'),
-    body('maxAgents').isInt({ min: 1 }).withMessage('Max agents limit is required'),
+    body('price').isNumeric().withMessage('Offer Price is required'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -96,14 +94,26 @@ router.post(
     }
 
     try {
-      const { title, durationMonths, price, maxDevices, maxAgents, features } = req.body;
+      const {
+        title,
+        durationMonths,
+        regularPrice,
+        price,
+        maxAdminDevices,
+        maxAgents,
+        maxDevicesPerAgent,
+        features,
+      } = req.body;
 
       const newPkg = new SubscriptionPackage({
         title,
         durationMonths,
-        price,
-        maxDevices,
-        maxAgents,
+        regularPrice: Number(regularPrice || price),
+        price: Number(price),
+        maxAdminDevices: Number(maxAdminDevices || 1),
+        maxAgents: Number(maxAgents || 1),
+        maxDevicesPerAgent: Number(maxDevicesPerAgent || 1),
+        maxDevices: Number(maxAdminDevices || 1) + Number(maxAgents || 1) * Number(maxDevicesPerAgent || 1),
         features: Array.isArray(features) ? features : [],
       });
 
@@ -121,7 +131,18 @@ router.post(
  */
 router.put('/packages/:id', async (req, res) => {
   try {
-    const pkg = await SubscriptionPackage.findByIdAndUpdate(req.params.id, req.body, {
+    const { maxAdminDevices, maxAgents, maxDevicesPerAgent } = req.body;
+    const updateData = {
+      ...req.body,
+      ...(maxAdminDevices || maxAgents || maxDevicesPerAgent
+        ? {
+            maxDevices:
+              Number(maxAdminDevices || 1) + Number(maxAgents || 1) * Number(maxDevicesPerAgent || 1),
+          }
+        : {}),
+    };
+
+    const pkg = await SubscriptionPackage.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

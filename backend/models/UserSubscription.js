@@ -20,8 +20,10 @@ const UserSubscriptionSchema = new mongoose.Schema(
     startDate: { type: Date, default: Date.now },
     endDate: { type: Date, required: true },
     active: { type: Boolean, default: true },
-    maxDevicesSnapshot: { type: Number, default: 1 },
+    maxAdminDevicesSnapshot: { type: Number, default: 1 },
     maxAgentsSnapshot: { type: Number, default: 2 },
+    maxDevicesPerAgentSnapshot: { type: Number, default: 1 },
+    maxDevicesSnapshot: { type: Number, default: 3 },
   },
   { timestamps: true }
 );
