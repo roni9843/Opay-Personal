@@ -19,38 +19,38 @@ export default function ApiWebhooks() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Code2 className="w-6 h-6 text-purple-400" />
+        <h1 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
+          <Code2 className="w-7 h-7 text-fancyPink" />
           API Keys & Webhooks Documentation
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-purple-200/70 text-sm mt-1 font-medium">
           Integrate automated mobile banking payment verification into your website or e-commerce shop
         </p>
       </div>
 
       {/* Private API Key Box */}
-      <div className="glass-panel p-6 rounded-2xl border border-purple-500/20 bg-gradient-to-r from-purple-950/20 via-slate-900 to-indigo-950/20">
-        <label className="block text-xs font-semibold text-purple-300 uppercase tracking-wider mb-2">
+      <div className="fancy-card p-6 md:p-8 rounded-3xl border border-fancyPink/30 bg-gradient-to-r from-purple-950/60 via-pink-950/30 to-slate-950/80 shadow-2xl">
+        <label className="block text-xs font-extrabold text-pink-300 uppercase tracking-wider mb-2.5">
           Your Private API Secret Key
         </label>
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative flex-1 w-full">
             <input
               type={showKey ? 'text' : 'password'}
               readOnly
               value={apiKey}
-              className="w-full pl-4 pr-10 py-3 bg-black/50 border border-slate-700/80 rounded-xl text-sm font-mono text-purple-200 focus:outline-none"
+              className="w-full pl-4 pr-10 py-3.5 bg-[#140c29] border border-purple-500/40 rounded-2xl text-sm font-mono text-pink-200 focus:outline-none"
             />
             <button
               onClick={() => setShowKey(!showKey)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-purple-400 hover:text-white"
             >
               {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           <button
             onClick={handleCopy}
-            className="px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shrink-0 shadow-lg shadow-purple-600/20"
+            className="w-full sm:w-auto px-5 py-3.5 btn-fancy-pink text-white rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg"
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'Copied!' : 'Copy Key'}</span>
@@ -59,37 +59,37 @@ export default function ApiWebhooks() {
       </div>
 
       {/* Webhook Settings */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10">
-        <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-          <Globe className="w-5 h-5 text-indigo-400" />
+      <div className="fancy-container p-6 md:p-8 rounded-3xl border border-purple-500/20 shadow-xl">
+        <h3 className="text-base font-extrabold text-white mb-2 flex items-center gap-2.5">
+          <Globe className="w-5 h-5 text-fancyCyan" />
           Payment Notification Webhook Endpoint
         </h3>
-        <p className="text-xs text-slate-400 mb-4">
+        <p className="text-xs text-purple-200/70 mb-5 font-medium">
           When an SMS payment (Bkash/Nagad/Rocket) is received by your Android phone, O-Pay instantly posts payment JSON to this URL.
         </p>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="url"
             value={webhookUrl}
             onChange={(e) => setWebhookUrl(e.target.value)}
             placeholder="https://yourwebsite.com/api/payment-webhook"
-            className="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+            className="flex-1 px-4 py-3.5 bg-[#180f33]/80 border border-purple-500/30 rounded-2xl text-sm text-white placeholder-purple-300/40 focus:outline-none focus:border-fancyPink"
           />
-          <button className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-all flex items-center gap-2 shrink-0">
+          <button className="px-6 py-3.5 btn-fancy-purple text-white font-bold rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg">
             <Send className="w-4 h-4" /> Save Webhook URL
           </button>
         </div>
       </div>
 
       {/* REST API Example */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10">
-        <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+      <div className="fancy-container p-6 md:p-8 rounded-3xl border border-purple-500/20 shadow-xl">
+        <h3 className="text-base font-extrabold text-white mb-3 flex items-center gap-2.5">
           <Terminal className="w-5 h-5 text-emerald-400" />
           Node.js Payment Verification Request Example
         </h3>
 
-        <pre className="p-4 rounded-xl bg-black/70 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto">
+        <pre className="p-5 rounded-2xl bg-[#0d071a] border border-purple-500/30 text-xs font-mono text-emerald-300 overflow-x-auto shadow-inner">
 {`const fetch = require('node-fetch');
 
 const response = await fetch('http://localhost:5000/api/payment/verify-trx', {

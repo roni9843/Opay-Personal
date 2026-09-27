@@ -41,81 +41,81 @@ export default function Profile() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <UserCheck className="w-6 h-6 text-purple-400" />
+        <h1 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
+          <UserCheck className="w-7 h-7 text-fancyPink" />
           Company Profile Settings
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-purple-200/70 text-sm mt-1 font-medium">
           Manage your merchant company details and owner contact profile
         </p>
       </div>
 
-      <div className="glass-panel p-6 rounded-2xl border border-white/10">
+      <div className="fancy-container p-6 md:p-8 rounded-3xl border border-purple-500/20 shadow-2xl">
         {msg && (
-          <div className="mb-6 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-purple-400" />
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             <span>{msg}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-purple-200 uppercase tracking-wider mb-2">
               Company Name
             </label>
             <div className="relative">
-              <Building2 className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Building2 className="w-5 h-5 text-purple-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full pl-11 pr-4 py-3.5 bg-[#180f33]/80 border border-purple-500/30 rounded-2xl text-sm text-white focus:outline-none focus:border-fancyPink"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-purple-200 uppercase tracking-wider mb-2">
               Owner Name
             </label>
             <div className="relative">
-              <User className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <User className="w-5 h-5 text-purple-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full pl-11 pr-4 py-3.5 bg-[#180f33]/80 border border-purple-500/30 rounded-2xl text-sm text-white focus:outline-none focus:border-fancyPink"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-purple-200 uppercase tracking-wider mb-2">
                 Mobile Number
               </label>
               <div className="relative">
-                <Phone className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Phone className="w-5 h-5 text-purple-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                  className="w-full pl-11 pr-4 py-3.5 bg-[#180f33]/80 border border-purple-500/30 rounded-2xl text-sm text-white focus:outline-none focus:border-fancyPink"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-purple-200 uppercase tracking-wider mb-2">
                 Email Address (Account ID)
               </label>
               <div className="relative">
-                <Mail className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-5 h-5 text-purple-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   disabled
                   value={formData.email}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl text-sm text-slate-500 cursor-not-allowed"
+                  className="w-full pl-11 pr-4 py-3.5 bg-[#100824]/60 border border-purple-500/20 rounded-2xl text-sm text-purple-300/50 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function Profile() {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-2"
+            className="px-6 py-3.5 btn-fancy-pink text-white text-xs font-extrabold rounded-2xl shadow-xl flex items-center gap-2"
           >
             <Save className="w-4 h-4" /> Save Profile Changes
           </button>
