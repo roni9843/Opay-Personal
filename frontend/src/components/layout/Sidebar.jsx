@@ -100,8 +100,8 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="w-64 border-r border-white/10 bg-[#160d2e]/80 backdrop-blur-xl flex flex-col justify-between hidden md:flex shrink-0 min-h-[calc(100vh-4rem)] p-4 space-y-6">
+      {/* Desktop Sidebar (Fixed / Sticky) */}
+      <aside className="w-64 border-r border-white/10 bg-[#160d2e]/80 backdrop-blur-xl flex flex-col justify-between hidden md:flex shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-4 space-y-6">
         <SidebarContent />
         <div className="fancy-card p-4 rounded-2xl border border-purple-500/20 bg-gradient-to-tr from-purple-900/40 to-indigo-900/40 text-center space-y-2">
           <div className="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center mx-auto text-fancyCyan">
