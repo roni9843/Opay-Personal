@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastProvider } from './context/ToastContext';
 
 // Layout
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -25,41 +26,43 @@ import PaymentPage from './pages/checkout/PaymentPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/checkout/:sessionToken" element={<PaymentPage />} />
+    <ToastProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/checkout/:sessionToken" element={<PaymentPage />} />
 
-        {/* Super Admin Routes */}
-        <Route element={<DashboardLayout allowedRoles={['super_admin']} />}>
-          <Route path="/super-admin" element={<SuperAdminDashboard />} />
-          <Route path="/super-admin/packages" element={<Packages />} />
-          <Route path="/super-admin/companies" element={<Companies />} />
-          <Route path="/super-admin/companies/:id" element={<CompanyDetails />} />
-          <Route path="/super-admin/purchased-subscriptions" element={<PurchasedSubscriptions />} />
-          <Route path="/super-admin/sms-logs" element={<SmsLogs />} />
-        </Route>
+          {/* Super Admin Routes */}
+          <Route element={<DashboardLayout allowedRoles={['super_admin']} />}>
+            <Route path="/super-admin" element={<SuperAdminDashboard />} />
+            <Route path="/super-admin/packages" element={<Packages />} />
+            <Route path="/super-admin/companies" element={<Companies />} />
+            <Route path="/super-admin/companies/:id" element={<CompanyDetails />} />
+            <Route path="/super-admin/purchased-subscriptions" element={<PurchasedSubscriptions />} />
+            <Route path="/super-admin/sms-logs" element={<SmsLogs />} />
+          </Route>
 
-        {/* Company Owner Routes */}
-        <Route element={<DashboardLayout allowedRoles={['company_owner']} />}>
-          <Route path="/company" element={<CompanyDashboard />} />
-          <Route path="/company/agents" element={<Agents />} />
-          <Route path="/company/devices" element={<Devices />} />
-          <Route path="/company/payment-methods" element={<PaymentMethods />} />
-          <Route path="/company/api-settings" element={<ApiSettings />} />
-          <Route path="/company/transactions" element={<Transactions />} />
-        </Route>
+          {/* Company Owner Routes */}
+          <Route element={<DashboardLayout allowedRoles={['company_owner']} />}>
+            <Route path="/company" element={<CompanyDashboard />} />
+            <Route path="/company/agents" element={<Agents />} />
+            <Route path="/company/devices" element={<Devices />} />
+            <Route path="/company/payment-methods" element={<PaymentMethods />} />
+            <Route path="/company/api-settings" element={<ApiSettings />} />
+            <Route path="/company/transactions" element={<Transactions />} />
+          </Route>
 
-        {/* Staff Agent Routes */}
-        <Route element={<DashboardLayout allowedRoles={['agent']} />}>
-          <Route path="/agent" element={<AgentDashboard />} />
-          <Route path="/agent/transactions" element={<Transactions />} />
-        </Route>
+          {/* Staff Agent Routes */}
+          <Route element={<DashboardLayout allowedRoles={['agent']} />}>
+            <Route path="/agent" element={<AgentDashboard />} />
+            <Route path="/agent/transactions" element={<Transactions />} />
+          </Route>
 
-        {/* Default Catch-all */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Default Catch-all */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }

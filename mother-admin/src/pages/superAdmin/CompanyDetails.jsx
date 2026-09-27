@@ -16,9 +16,9 @@ import {
   Trash2,
   Key,
   X,
-  CheckCircle2,
   ShieldAlert
 } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 export default function CompanyDetails() {
   const { id } = useParams();
@@ -78,15 +78,17 @@ export default function CompanyDetails() {
     }
   };
 
+  const { showToast } = useToast();
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
       await API.put(`/super-admin/companies/${id}`, editData);
       setEditModalOpen(false);
-      alert('Company details & package updated successfully');
+      showToast('Company details & package updated successfully', 'success');
       fetchCompanyDetails();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error updating details');
+      showToast(err.response?.data?.message || 'Error updating details', 'error');
     }
   };
 
@@ -95,10 +97,10 @@ export default function CompanyDetails() {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     try {
       await API.patch(`/super-admin/companies/${id}/status`, { status: newStatus });
-      alert(`Company status changed to ${newStatus}`);
+      showToast(`Company status changed to ${newStatus}`, newStatus === 'active' ? 'success' : 'warning');
       fetchCompanyDetails();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update status');
+      showToast(err.response?.data?.message || 'Failed to update status', 'error');
     }
   };
 
@@ -108,10 +110,10 @@ export default function CompanyDetails() {
 
     try {
       await API.delete(`/super-admin/companies/${id}`);
-      alert('Company account and all resources deleted successfully');
+      showToast('Company account and all resources deleted successfully', 'success');
       navigate('/super-admin/companies');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete company');
+      showToast(err.response?.data?.message || 'Failed to delete company', 'error');
     }
   };
 
