@@ -3,7 +3,11 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const UserSubscription = require('../models/UserSubscription');
+const SubscriptionPackage = require('../models/SubscriptionPackage');
+const SmsLog = require('../models/SmsLog');
 const { protect } = require('../middleware/authMiddleware');
+const { sendOtpSms } = require('../utils/smsGateway');
 
 // Helper to generate JWT Token
 const generateToken = (id) => {
@@ -11,6 +15,140 @@ const generateToken = (id) => {
     expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
+
+/**
+ * POST /api/auth/send-otp
+ * Send Phone Verification OTP
+ */
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ success: false, message: 'Phone number is required' });
+    }
+
+    const result = await sendOtpSms(phone);
+    return res.json(result);
+  } catch (err) {
+    console.error('[Send OTP Error]:', err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/auth/register-company
+ * Public: Company Owner Sign Up / Register Profile with OTP verification
+ */
+router.post(
+  '/register-company',
+  [
+    body('companyName').notEmpty().withMessage('Company name is required'),
+    body('name').notEmpty().withMessage('Full name is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('phone').notEmpty().withMessage('Phone number is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('confirmPassword').notEmpty().withMessage('Confirm password is required'),
+    body('otp').notEmpty().withMessage('OTP is required'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ success: false, errors: errors.array() });
+    }
+
+    try {
+      const { companyName, name, email, phone, password, confirmPassword, otp } = req.body;
+
+      if (password !== confirmPassword) {
+        return res.status(400).json({ success: false, message: 'Passwords do not match' });
+      }
+
+      // Check if email already registered
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: 'Email address is already registered' });
+      }
+
+      // Format phone to check OTP log
+      let formattedPhone = phone.trim().replace(/\D/g, '');
+      if (!formattedPhone.startsWith('88')) {
+        formattedPhone = '88' + formattedPhone;
+      }
+
+      // Verify OTP from recent SmsLog
+      const latestOtpLog = await SmsLog.findOne({ recipient: formattedPhone, type: 'otp' }).sort({ createdAt: -1 });
+
+      if (!latestOtpLog || latestOtpLog.otp !== otp.trim()) {
+        return res.status(400).json({ success: false, message: 'Invalid or expired OTP code' });
+      }
+
+      // 1. Create Company Owner User
+      const companyUser = new User({
+        name,
+        companyName,
+        email: email.toLowerCase(),
+        phone,
+        password,
+        role: 'company_owner',
+        status: 'active',
+      });
+      await companyUser.save();
+
+      // 2. Assign Default Package Subscription (Starter 1 Month)
+      let pkg = await SubscriptionPackage.findOne({ active: true }).sort({ price: 1 });
+      if (!pkg) {
+        pkg = new SubscriptionPackage({
+          title: 'Starter Pack (1 Month)',
+          durationMonths: 1,
+          regularPrice: 2000,
+          price: 1499,
+          maxAdminDevices: 1,
+          maxAgents: 2,
+          maxDevicesPerAgent: 1,
+          maxDevices: 3,
+        });
+        await pkg.save();
+      }
+
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + pkg.durationMonths * 30 * 24 * 60 * 60 * 1000);
+
+      const subscription = new UserSubscription({
+        companyOwner: companyUser._id,
+        package: pkg._id,
+        apiKey: UserSubscription.generateApiKey(),
+        startDate,
+        endDate,
+        active: true,
+        maxAdminDevicesSnapshot: pkg.maxAdminDevices,
+        maxAgentsSnapshot: pkg.maxAgents,
+        maxDevicesPerAgentSnapshot: pkg.maxDevicesPerAgent,
+        maxDevicesSnapshot: pkg.maxDevices,
+      });
+      await subscription.save();
+
+      const token = generateToken(companyUser._id);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Company Owner account created successfully',
+        token,
+        user: {
+          id: companyUser._id,
+          name: companyUser.name,
+          email: companyUser.email,
+          phone: companyUser.phone,
+          role: companyUser.role,
+          companyName: companyUser.companyName,
+          status: companyUser.status,
+        },
+      });
+    } catch (err) {
+      console.error('Company Register Error:', err);
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  }
+);
 
 /**
  * POST /api/auth/login

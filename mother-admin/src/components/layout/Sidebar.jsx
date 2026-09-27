@@ -10,6 +10,7 @@ import {
   CreditCard,
   Key,
   Receipt,
+  MessageSquare,
   Sparkles,
   Zap,
   X,
@@ -26,6 +27,7 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
         { label: 'Mother Overview', path: '/super-admin', icon: LayoutDashboard },
         { label: 'Subscription Packages', path: '/super-admin/packages', icon: Package },
         { label: 'Companies & Owners', path: '/super-admin/companies', icon: Building2 },
+        { label: 'SMS Gateway Panel', path: '/super-admin/sms-logs', icon: MessageSquare },
       ];
     }
 

@@ -9,6 +9,7 @@ import Login from './pages/auth/Login';
 import SuperAdminDashboard from './pages/superAdmin/Dashboard';
 import Packages from './pages/superAdmin/Packages';
 import Companies from './pages/superAdmin/Companies';
+import SmsLogs from './pages/superAdmin/SmsLogs';
 
 import CompanyDashboard from './pages/company/Dashboard';
 import Agents from './pages/company/Agents';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/packages" element={<Packages />} />
           <Route path="/super-admin/companies" element={<Companies />} />
+          <Route path="/super-admin/sms-logs" element={<SmsLogs />} />
         </Route>
 
         {/* Company Owner Routes */}

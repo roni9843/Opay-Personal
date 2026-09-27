@@ -8,6 +8,7 @@ const Device = require('../models/Device');
 const PaymentMessage = require('../models/PaymentMessage');
 const PaymentSession = require('../models/PaymentSession');
 const SiteSetting = require('../models/SiteSetting');
+const SmsLog = require('../models/SmsLog');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
@@ -334,6 +335,34 @@ router.post('/companies/:id/extend-subscription', async (req, res) => {
     }
 
     return res.json({ success: true, message: 'Subscription extended successfully', data: sub });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/super-admin/sms-logs
+ * List all SMS Gateway logs (OTPs & sent SMS)
+ */
+router.get('/sms-logs', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const logs = await SmsLog.find({})
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await SmsLog.countDocuments({});
+
+    return res.json({
+      success: true,
+      data: logs,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
