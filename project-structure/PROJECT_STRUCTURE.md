@@ -76,7 +76,7 @@
 │   ├── package.json
 │   └── server.js                 <-- Express + Socket.IO entry point
 │
-└── frontend/
+└── mother-admin/
     ├── public/
     ├── src/
     │   ├── components/
