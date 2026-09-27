@@ -207,6 +207,11 @@ router.put('/update-profile', protect, async (req, res) => {
       message: 'Profile updated successfully',
       user,
     });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 /**
  * GET /api/auth/me-status
  * Public token check: Fetch current user status even if suspended
