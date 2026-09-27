@@ -51,8 +51,8 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex relative">
-      {/* Huge Suspended Overlay Screen */}
-      {isSuspended ? (
+      {/* Full-Page Suspended Screen Overlay */}
+      {isSuspended && (
         <div className="fixed inset-0 z-50 bg-[#090d16]/98 backdrop-blur-3xl flex items-center justify-center p-4">
           <div className="max-w-xl w-full p-8 md:p-10 rounded-3xl fancy-card border-2 border-rose-500/70 shadow-2xl text-center space-y-6 relative overflow-hidden bg-gradient-to-b from-rose-950/50 via-purple-950/60 to-[#090d16]">
             {/* Background Glow */}
@@ -85,17 +85,30 @@ export default function Layout() {
             </div>
           </div>
         </div>
-      ) : (
-        <>
-          <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-          <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
-            <Navbar onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
-            <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-              <Outlet />
-            </main>
-          </div>
-        </>
       )}
+
+      {/* Main Layout */}
+      <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
+        <Navbar onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+
+        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          {/* Prominent Banner top of EVERY page if suspended */}
+          {isSuspended && (
+            <div className="mb-6 p-6 rounded-3xl bg-rose-600/20 border-2 border-rose-500 text-rose-100 shadow-2xl space-y-2 text-center">
+              <div className="flex items-center justify-center gap-2 text-rose-300 font-extrabold text-lg uppercase tracking-wider">
+                <ShieldAlert className="w-7 h-7 text-rose-400" />
+                <span>ACCOUNT SUSPENDED BY SUPER ADMIN</span>
+              </div>
+              <p className="text-sm font-bold text-white">
+                This merchant user is currently suspended. Access to their merchant dashboard is blocked.
+              </p>
+            </div>
+          )}
+
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
