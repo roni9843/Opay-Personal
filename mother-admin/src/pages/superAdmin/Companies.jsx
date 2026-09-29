@@ -124,21 +124,21 @@ export default function Companies() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-fancyPink" /> Company Owners & Merchants
+            <Building2 className="w-6 h-6 text-fancyPink" /> O-Pay Personal Companies & Owners
           </h2>
-          <p className="text-xs text-purple-200/70 mt-1">Manage platform merchant accounts, purchased packages, passwords & statuses</p>
+          <p className="text-xs text-purple-200/70 mt-1">Manage platform O-Pay Personal accounts, purchased packages, passwords & statuses</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 rounded-2xl btn-fancy-pink text-white text-xs font-bold shadow-lg flex items-center gap-2 transition-all self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Merchant Company</span>
+          <span>Add New O-Pay Personal Company</span>
         </button>
       </div>
 
       {isLoading ? (
-        <div className="text-purple-300 text-center py-8">Loading merchant accounts...</div>
+        <div className="text-purple-300 text-center py-8">Loading O-Pay Personal accounts...</div>
       ) : (
         <div className="fancy-container rounded-3xl border border-purple-500/20 overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
@@ -355,7 +355,7 @@ export default function Companies() {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-extrabold text-white mb-4">Create New Merchant Company</h3>
+            <h3 className="text-lg font-extrabold text-white mb-4">Create New O-Pay Personal Company</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">

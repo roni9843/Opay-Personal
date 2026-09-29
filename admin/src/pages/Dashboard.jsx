@@ -15,12 +15,14 @@ import { useAuthStore } from '../store/useAuthStore';
 export default function Dashboard() {
   const { user } = useAuthStore();
   const [subInfo, setSubInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
       const res = await api.get('/company/subscription');
       if (res.data.success) {
@@ -28,14 +30,20 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.log('Subscription info load:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const maxAdminDevices = subInfo?.maxAdminDevicesSnapshot || 1;
-  const maxAgents = subInfo?.maxAgentsSnapshot || 2;
-  const maxDevicesPerAgent = subInfo?.maxDevicesPerAgentSnapshot || 1;
-  const totalMaxDevices = subInfo?.maxDevicesSnapshot || (maxAdminDevices + (maxAgents * maxDevicesPerAgent));
+  const hasSubscription = Boolean(subInfo && subInfo.active);
+  const maxAdminDevices = subInfo ? (subInfo.maxAdminDevicesSnapshot || 0) : 0;
+  const maxAgents = subInfo ? (subInfo.maxAgentsSnapshot || 0) : 0;
+  const maxDevicesPerAgent = subInfo ? (subInfo.maxDevicesPerAgentSnapshot || 0) : 0;
+  const totalMaxDevices = subInfo ? (subInfo.maxDevicesSnapshot || (maxAdminDevices + (maxAgents * maxDevicesPerAgent))) : 0;
   const totalSimCapacity = totalMaxDevices * 2;
+  const freeSms = subInfo?.package?.freeSmsCount || 0;
+  const extraSms = subInfo?.extraSmsBalance || 0;
+  const totalAvailableSms = freeSms + extraSms;
 
   return (
     <div className="space-y-6">
@@ -48,24 +56,47 @@ export default function Dashboard() {
               <Sparkles className="w-4 h-4 text-fancyPink animate-pulse" /> Company Control Panel
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-              Welcome back, {user?.name || 'Merchant'}! 👋
+              Welcome back, {user?.name || 'O-Pay Personal Owner'}! 👋
             </h1>
             <p className="text-purple-200/80 text-sm mt-1.5 font-medium">
               Company: <span className="text-pink-300 font-bold">{user?.companyName}</span> | Automated SIM Gateway Control Center
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="px-4 py-2.5 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/20">
-              <Zap className="w-4 h-4 text-emerald-400 animate-bounce" />
-              <span>Gateway Engine Online</span>
+            <div className={`px-4 py-2.5 rounded-2xl border text-xs font-bold flex items-center gap-2 shadow-lg ${
+              hasSubscription ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+            }`}>
+              <Zap className={`w-4 h-4 ${hasSubscription ? 'text-emerald-400 animate-bounce' : 'text-rose-400'}`} />
+              <span>{hasSubscription ? 'Gateway Engine Online' : 'No Active Package'}</span>
             </div>
           </div>
         </div>
       </div>
 
+      {/* No Active Package Warning Alert */}
+      {!hasSubscription && !loading && (
+        <div className="p-6 rounded-3xl bg-amber-500/15 border-2 border-amber-500/40 text-amber-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xl">
+          <div className="flex items-start gap-3.5">
+            <Sparkles className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-base font-extrabold text-amber-300">No Active Subscription Package</h4>
+              <p className="text-xs text-amber-200/80 mt-1 font-medium">
+                You currently do not have an active package subscription. Please purchase a package to activate SIM Devices, Staff Agents, and Webhook Callbacks.
+              </p>
+            </div>
+          </div>
+          <a
+            href="/packages"
+            className="px-6 py-3 rounded-2xl btn-fancy-pink text-white text-xs font-extrabold shadow-lg shrink-0 text-center"
+          >
+            Buy Package Now
+          </a>
+        </div>
+      )}
+
       {/* Metrics Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Metric 1 */}
+        {/* Metric 1: Admin Devices */}
         <div className="p-6 rounded-3xl fancy-card relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-purple-200/80 uppercase tracking-wider">Admin Devices</span>
@@ -80,7 +111,7 @@ export default function Dashboard() {
           <p className="text-[11px] text-purple-300/60 mt-2 font-medium">Dedicated Admin SIM controller</p>
         </div>
 
-        {/* Metric 2 */}
+        {/* Metric 2: Staff Agents Quota */}
         <div className="p-6 rounded-3xl fancy-card fancy-card-cyan relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-purple-200/80 uppercase tracking-wider">Staff Agents Quota</span>
@@ -95,19 +126,21 @@ export default function Dashboard() {
           <p className="text-[11px] text-purple-300/60 mt-2 font-medium">{maxDevicesPerAgent} device(s) allowed per agent</p>
         </div>
 
-        {/* Metric 3 */}
-        <div className="p-6 rounded-3xl fancy-card relative overflow-hidden group">
+        {/* Metric 3: Total Available SMS Quota */}
+        <div className="p-6 rounded-3xl fancy-card relative overflow-hidden group border border-amber-500/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-purple-200/80 uppercase tracking-wider">Total Devices</span>
-            <div className="p-3 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-lg shadow-purple-500/20">
-              <Layers className="w-6 h-6" />
+            <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">Available SMS</span>
+            <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-lg shadow-amber-500/20">
+              <Activity className="w-6 h-6 text-amber-400" />
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-4xl font-extrabold text-white">{totalMaxDevices}</span>
-            <span className="text-xs text-purple-300 ml-2 font-medium">Total Gateway Devices</span>
+            <span className="text-4xl font-extrabold text-white">{totalAvailableSms}</span>
+            <span className="text-xs text-amber-300 ml-2 font-bold">SMS Balance</span>
           </div>
-          <p className="text-[11px] text-purple-300/60 mt-2 font-medium">Admin + Agent aggregate devices</p>
+          <p className="text-[11px] text-purple-300/60 mt-2 font-medium">
+            Included: {freeSms} | Extra: {extraSms}
+          </p>
         </div>
 
         {/* Metric 4: SIM Capacity (devices * 2) */}
@@ -136,16 +169,18 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div className="p-5 rounded-2xl bg-[#180f33]/80 border border-purple-500/20">
             <p className="text-xs text-purple-300 font-bold uppercase tracking-wider">Current Package Plan</p>
-            <p className="text-xl font-extrabold text-pink-300 mt-2">{subInfo?.package?.title || 'Starter Pack (1 Month)'}</p>
-            <span className="inline-block px-3 py-1 mt-3 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-              Active Subscription
+            <p className="text-xl font-extrabold text-pink-300 mt-2">{subInfo?.package?.title || 'No Active Package'}</p>
+            <span className={`inline-block px-3 py-1 mt-3 rounded-full text-xs font-bold border ${
+              hasSubscription ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+            }`}>
+              {hasSubscription ? 'Active Subscription' : 'No Package Purchased'}
             </span>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#180f33]/80 border border-purple-500/20">
             <p className="text-xs text-purple-300 font-bold uppercase tracking-wider">API Integration Key</p>
             <p className="text-xs font-mono text-purple-200 mt-3 truncate bg-[#100922] px-3.5 py-2.5 rounded-xl border border-purple-500/30">
-              {subInfo?.apiKey || 'opay_live_9f81a7b3c4e5d6a7b8c9'}
+              {subInfo?.apiKey || 'No API Key generated'}
             </p>
           </div>
 

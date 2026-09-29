@@ -49,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
             <div>
               <h1 className="text-base font-extrabold text-white tracking-wide">O-Pay Admin</h1>
-              <p className="text-[11px] text-pink-300 font-medium">Merchant Dashboard</p>
+              <p className="text-[11px] text-pink-300 font-medium">O-Pay Personal Dashboard</p>
             </div>
           </div>
           <button

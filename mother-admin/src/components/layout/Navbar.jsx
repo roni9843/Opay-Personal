@@ -17,7 +17,7 @@ export default function Navbar({ onToggleMobileMenu }) {
       case 'company_owner':
         return (
           <span className="hidden sm:flex px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white backdrop-blur-md border border-white/30 items-center gap-1.5 shadow-sm">
-            <Building className="w-3.5 h-3.5 text-emerald-300" /> Merchant Owner
+            <Building className="w-3.5 h-3.5 text-emerald-300" /> O-Pay Personal Owner
           </span>
         );
       case 'agent':

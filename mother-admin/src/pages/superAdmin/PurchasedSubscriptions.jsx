@@ -33,7 +33,7 @@ export default function PurchasedSubscriptions() {
             Purchased Subscription Logs
           </h2>
           <p className="text-xs text-purple-200/70 mt-1 font-medium">
-            List of all merchant package purchases processed via OraclePay Auto Deposit Gateway
+            List of all O-Pay Personal package purchases processed via OraclePay Auto Deposit Gateway
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function PurchasedSubscriptions() {
               <thead className="bg-[#150c2d]/70 border-b border-purple-500/20 text-purple-300 uppercase tracking-wider font-bold">
                 <tr>
                   <th className="py-4 px-5">Invoice Number</th>
-                  <th className="py-4 px-5">Merchant / Company</th>
+                  <th className="py-4 px-5">O-Pay Personal User / Company</th>
                   <th className="py-4 px-5">Package Purchased</th>
                   <th className="py-4 px-5">Amount</th>
                   <th className="py-4 px-5">Gateway & TrxID</th>
@@ -81,7 +81,7 @@ export default function PurchasedSubscriptions() {
                   <tr key={item._id} className="hover:bg-purple-900/20 transition-colors">
                     <td className="py-4 px-5 font-mono font-bold text-pink-300">{item.invoiceNumber}</td>
                     <td className="py-4 px-5">
-                      <p className="font-extrabold text-white">{item.companyOwner?.companyName || 'Merchant'}</p>
+                      <p className="font-extrabold text-white">{item.companyOwner?.companyName || 'O-Pay Personal User'}</p>
                       <p className="text-purple-300/60 text-[11px]">{item.companyOwner?.email}</p>
                     </td>
                     <td className="py-4 px-5">

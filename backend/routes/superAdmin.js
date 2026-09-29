@@ -10,11 +10,53 @@ const PaymentSession = require('../models/PaymentSession');
 const SiteSetting = require('../models/SiteSetting');
 const SmsLog = require('../models/SmsLog');
 const SubscriptionPurchase = require('../models/SubscriptionPurchase');
+const GlobalSetting = require('../models/GlobalSetting');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
 // Restrict all routes in this file to super_admin
 router.use(protect, authorize('super_admin'));
+
+/**
+ * GET /api/super-admin/sms-settings
+ * Get SMS rate settings (per SMS cost in BDT)
+ */
+router.get('/sms-settings', async (req, res) => {
+  try {
+    let setting = await GlobalSetting.findOne({ key: 'sms_rate_settings' });
+    if (!setting) {
+      setting = await GlobalSetting.create({
+        key: 'sms_rate_settings',
+        smsPerRate: 0.50,
+        minSmsPurchaseQty: 100,
+      });
+    }
+    return res.json({ success: true, data: setting });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * PUT /api/super-admin/sms-settings
+ * Update SMS per rate (BDT) and minimum purchase quantity
+ */
+router.put('/sms-settings', async (req, res) => {
+  try {
+    const { smsPerRate, minSmsPurchaseQty } = req.body;
+    let setting = await GlobalSetting.findOne({ key: 'sms_rate_settings' });
+    if (!setting) {
+      setting = new GlobalSetting({ key: 'sms_rate_settings' });
+    }
+    if (smsPerRate !== undefined) setting.smsPerRate = Number(smsPerRate);
+    if (minSmsPurchaseQty !== undefined) setting.minSmsPurchaseQty = Number(minSmsPurchaseQty);
+    await setting.save();
+
+    return res.json({ success: true, message: 'SMS rate settings updated successfully', data: setting });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 /**
  * GET /api/super-admin/dashboard-stats
@@ -104,6 +146,9 @@ router.post(
         maxAdminDevices,
         maxAgents,
         maxDevicesPerAgent,
+        freeSmsCount,
+        chargeType,
+        chargeValue,
         features,
       } = req.body;
 
@@ -116,6 +161,9 @@ router.post(
         maxAgents: Number(maxAgents || 1),
         maxDevicesPerAgent: Number(maxDevicesPerAgent || 1),
         maxDevices: Number(maxAdminDevices || 1) + Number(maxAgents || 1) * Number(maxDevicesPerAgent || 1),
+        freeSmsCount: Number(freeSmsCount !== undefined ? freeSmsCount : 1000),
+        chargeType: chargeType === 'flat' ? 'flat' : 'percentage',
+        chargeValue: Number(chargeValue || 0),
         features: Array.isArray(features) ? features : [],
       });
 
@@ -489,7 +537,7 @@ router.delete('/companies/:id', async (req, res) => {
 
 /**
  * GET /api/super-admin/purchased-subscriptions
- * List all subscription purchases made by merchant companies
+ * List all subscription purchases made by opay-personal companies
  */
 router.get('/purchased-subscriptions', async (req, res) => {
   try {

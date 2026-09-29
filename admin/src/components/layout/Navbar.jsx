@@ -33,9 +33,9 @@ export default function Navbar({ onMobileMenuToggle }) {
           </div>
           <div>
             <h2 className="text-sm font-extrabold text-white tracking-wide flex items-center gap-2">
-              <span>{user?.companyName || 'Merchant Admin'}</span>
+              <span>{user?.companyName || 'O-Pay Personal Admin'}</span>
               <span className="px-2 py-0.5 rounded-full text-[10px] bg-fancyPink/20 text-pink-300 font-bold uppercase tracking-wider border border-fancyPink/40">
-                Merchant
+                O-Pay Personal
               </span>
             </h2>
           </div>

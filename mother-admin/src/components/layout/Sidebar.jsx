@@ -14,6 +14,7 @@ import {
   Sparkles,
   Zap,
   X,
+  Settings,
 } from 'lucide-react';
 
 export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
@@ -26,6 +27,7 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
       return [
         { label: 'Mother Overview', path: '/super-admin', icon: LayoutDashboard },
         { label: 'Subscription Packages', path: '/super-admin/packages', icon: Package },
+        { label: 'SMS Rate Settings', path: '/super-admin/sms-settings', icon: Settings },
         { label: 'Companies & Owners', path: '/super-admin/companies', icon: Building2 },
         { label: 'Purchased Subscriptions', path: '/super-admin/purchased-subscriptions', icon: CreditCard },
         { label: 'SMS Gateway Panel', path: '/super-admin/sms-logs', icon: MessageSquare },
@@ -34,7 +36,7 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
 
     if (user.role === 'company_owner') {
       return [
-        { label: 'Merchant Overview', path: '/company', icon: LayoutDashboard },
+        { label: 'O-Pay Personal Overview', path: '/company', icon: LayoutDashboard },
         { label: 'Staff Agents', path: '/company/agents', icon: Users },
         { label: 'SIM Devices', path: '/company/devices', icon: Smartphone },
         { label: 'Payment Numbers', path: '/company/payment-methods', icon: CreditCard },

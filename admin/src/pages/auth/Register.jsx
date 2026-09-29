@@ -99,7 +99,7 @@ export default function Register() {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create merchant account');
+      setError(err.response?.data?.message || 'Failed to create O-Pay Personal account');
     } finally {
       setLoading(false);
     }
@@ -116,10 +116,10 @@ export default function Register() {
         {/* Header Branding */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fancyPink/15 border border-fancyPink/30 text-pink-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-lg shadow-fancyPink/20">
-            <Sparkles className="w-4 h-4 text-fancyPink animate-pulse" /> Merchant Registration
+            <Sparkles className="w-4 h-4 text-fancyPink animate-pulse" /> O-Pay Personal Registration
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            Create Merchant Account
+            Create O-Pay Personal Account
           </h1>
           <p className="text-purple-200/70 text-sm mt-2 font-medium">
             Automate Bkash, Nagad & Rocket payment gateways with OTP verification
@@ -324,7 +324,7 @@ export default function Register() {
           {/* Footer Link */}
           <div className="text-center mt-6 pt-6 border-t border-purple-500/20">
             <p className="text-sm text-purple-200/70">
-              Already have a merchant account?{' '}
+              Already have an O-Pay Personal account?{' '}
               <Link to="/login" className="text-pink-400 font-extrabold hover:text-pink-300 hover:underline">
                 Sign In
               </Link>

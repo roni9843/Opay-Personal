@@ -9,6 +9,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import Login from './pages/auth/Login';
 import SuperAdminDashboard from './pages/superAdmin/Dashboard';
 import Packages from './pages/superAdmin/Packages';
+import SmsSettings from './pages/superAdmin/SmsSettings';
 import Companies from './pages/superAdmin/Companies';
 import CompanyDetails from './pages/superAdmin/CompanyDetails';
 import PurchasedSubscriptions from './pages/superAdmin/PurchasedSubscriptions';
@@ -37,6 +38,7 @@ export default function App() {
           <Route element={<DashboardLayout allowedRoles={['super_admin']} />}>
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/super-admin/packages" element={<Packages />} />
+            <Route path="/super-admin/sms-settings" element={<SmsSettings />} />
             <Route path="/super-admin/companies" element={<Companies />} />
             <Route path="/super-admin/companies/:id" element={<CompanyDetails />} />
             <Route path="/super-admin/purchased-subscriptions" element={<PurchasedSubscriptions />} />

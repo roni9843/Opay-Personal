@@ -46,7 +46,7 @@ export default function Profile() {
           Company Profile Settings
         </h1>
         <p className="text-purple-200/70 text-sm mt-1 font-medium">
-          Manage your merchant company details and owner contact profile
+          Manage your O-Pay Personal company details and owner contact profile
         </p>
       </div>
 

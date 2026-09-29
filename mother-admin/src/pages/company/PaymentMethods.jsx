@@ -175,7 +175,7 @@ export default function PaymentMethods() {
                   >
                     <option value="personal">Personal Account</option>
                     <option value="agent">Agent Account</option>
-                    <option value="merchant">Merchant Account</option>
+                    <option value="merchant">O-Pay Personal Account</option>
                   </select>
                 </div>
               </div>

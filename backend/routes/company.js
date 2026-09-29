@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const UserSubscription = require('../models/UserSubscription');
@@ -7,11 +8,116 @@ const Device = require('../models/Device');
 const PaymentMethod = require('../models/PaymentMethod');
 const PaymentMessage = require('../models/PaymentMessage');
 const PaymentSession = require('../models/PaymentSession');
+const GlobalSetting = require('../models/GlobalSetting');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
 // Restrict all routes in this file to company_owner
 router.use(protect, authorize('company_owner'));
+
+/**
+ * GET /api/company/sms-rate
+ * Get active per-SMS rate and minimum purchase quantity set by Super Admin
+ */
+router.get('/sms-rate', async (req, res) => {
+  try {
+    let setting = await GlobalSetting.findOne({ key: 'sms_rate_settings' });
+    if (!setting) {
+      setting = { smsPerRate: 0.50, minSmsPurchaseQty: 100 };
+    }
+    return res.json({ success: true, data: setting });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/company/purchase-sms
+ * Purchase extra SMS quota for company
+ */
+router.post('/purchase-sms', async (req, res) => {
+  try {
+    const { quantity } = req.body;
+    let setting = await GlobalSetting.findOne({ key: 'sms_rate_settings' });
+    const smsRate = setting ? setting.smsPerRate : 0.50;
+    const minQty = setting ? setting.minSmsPurchaseQty : 100;
+
+    const qty = Number(quantity || minQty);
+    if (qty < minQty) {
+      return res.status(400).json({ success: false, message: `Minimum SMS purchase quantity is ${minQty}` });
+    }
+
+    const totalPrice = Number((qty * smsRate).toFixed(2));
+
+    // Fetch user subscription
+    const sub = await UserSubscription.findOne({
+      companyOwner: req.user.id,
+      active: true,
+      endDate: { $gt: new Date() },
+    });
+
+    if (!sub) {
+      return res.status(400).json({
+        success: false,
+        message: 'You must have an active subscription package before purchasing extra SMS. Please buy a package first.',
+      });
+    }
+
+    const invoiceNumber = `INV-SMS-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const payload = {
+      payment_amount: totalPrice,
+      user_identity_address: req.user.email,
+      callback_url: `${req.protocol}://${req.get('host')}/api/payment/opay-webhook`,
+      success_redirect_url: `http://localhost:5174/packages?status=success&invoice=${invoiceNumber}`,
+      invoice_number: invoiceNumber,
+      checkout_items: {
+        smsQuantity: qty,
+        companyOwnerId: req.user.id.toString(),
+      },
+    };
+
+    let paymentPageUrl = '';
+
+    try {
+      const OPAY_BUSINESS_TOKEN = process.env.OPAY_BUSINESS_TOKEN || '4e6e3b608649c71c262472c51050e55113c58973b9b110b1';
+      const OPAY_BUSINESS_API_URL = process.env.OPAY_BUSINESS_API_URL || 'https://api.oraclepay.org/api/opay-business/generate-payment-page';
+      const response = await axios.post(OPAY_BUSINESS_API_URL, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Opay-Business-Token': OPAY_BUSINESS_TOKEN,
+        },
+        timeout: 10000,
+      });
+
+      if (response.data && response.data.success) {
+        paymentPageUrl = response.data.payment_page_url;
+      }
+    } catch (apiErr) {
+      console.warn('[SMS Payment Gateway Warning]: Using fallback URL:', apiErr.message);
+      paymentPageUrl = `https://pay.opay.com/payment/${invoiceNumber}`;
+    }
+
+    // Add purchased SMS to sub balance
+    sub.extraSmsBalance = (sub.extraSmsBalance || 0) + qty;
+    await sub.save();
+
+    return res.json({
+      success: true,
+      message: `Payment link generated for ${qty} SMS (৳${totalPrice.toFixed(2)} BDT). Please complete payment.`,
+      payment_page_url: paymentPageUrl,
+      invoiceNumber,
+      data: {
+        purchasedQty: qty,
+        ratePerSms: smsRate,
+        totalAmount: totalPrice,
+        newExtraSmsBalance: sub.extraSmsBalance,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 /**
  * GET /api/company/dashboard-stats
@@ -52,6 +158,27 @@ router.get('/dashboard-stats', async (req, res) => {
         todayTotalVolume,
         todayVerifiedCount,
       },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/company/subscription
+ * Get active subscription details or null if no active package
+ */
+router.get('/subscription', async (req, res) => {
+  try {
+    const sub = await UserSubscription.findOne({
+      companyOwner: req.user.id,
+      active: true,
+      endDate: { $gt: new Date() },
+    }).populate('package');
+
+    return res.json({
+      success: true,
+      subscription: sub || null,
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -158,6 +285,58 @@ router.patch('/agents/:id/status', async (req, res) => {
 
     if (!agent) return res.status(404).json({ success: false, message: 'Agent not found' });
     return res.json({ success: true, message: `Agent status updated to ${status}`, data: agent });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * PUT /api/company/agents/:id
+ * Edit staff agent details & optional password update
+ */
+router.put('/agents/:id', async (req, res) => {
+  try {
+    const { name, phone, password } = req.body;
+    const agent = await User.findOne({ _id: req.params.id, companyOwnerId: req.user.id });
+    if (!agent) return res.status(404).json({ success: false, message: 'Agent not found' });
+
+    if (name) agent.name = name;
+    if (phone !== undefined) agent.phone = phone;
+    if (password && password.trim().length >= 6) {
+      agent.password = password.trim();
+    }
+
+    await agent.save();
+
+    return res.json({
+      success: true,
+      message: 'Agent details updated successfully',
+      data: {
+        id: agent._id,
+        name: agent.name,
+        email: agent.email,
+        phone: agent.phone,
+        status: agent.status,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * DELETE /api/company/agents/:id
+ * Delete staff agent account
+ */
+router.delete('/agents/:id', async (req, res) => {
+  try {
+    const agent = await User.findOneAndDelete({ _id: req.params.id, companyOwnerId: req.user.id });
+    if (!agent) return res.status(404).json({ success: false, message: 'Agent not found' });
+
+    // Unassign agent from devices
+    await Device.updateMany({ assignedAgent: req.params.id }, { $unset: { assignedAgent: "" } });
+
+    return res.json({ success: true, message: 'Staff agent account deleted successfully' });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

@@ -9,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('opay_merchant_token');
+    const token = localStorage.getItem('opay_personal_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,15 +23,15 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       if (error.response.status === 401) {
-        localStorage.removeItem('opay_merchant_token');
-        localStorage.removeItem('opay_merchant_user');
+        localStorage.removeItem('opay_personal_token');
+        localStorage.removeItem('opay_personal_user');
         if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
           window.location.href = '/login';
         }
       } else if (error.response.status === 403) {
-        const storedUser = JSON.parse(localStorage.getItem('opay_merchant_user') || '{}');
+        const storedUser = JSON.parse(localStorage.getItem('opay_personal_user') || '{}');
         storedUser.status = 'suspended';
-        localStorage.setItem('opay_merchant_user', JSON.stringify(storedUser));
+        localStorage.setItem('opay_personal_user', JSON.stringify(storedUser));
         window.dispatchEvent(new Event('opay_user_suspended'));
       }
     }

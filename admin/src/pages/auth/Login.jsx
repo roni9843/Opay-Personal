@@ -49,7 +49,7 @@ export default function Login() {
         {/* Branding Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fancyPink/15 border border-fancyPink/30 text-pink-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-lg shadow-fancyPink/20">
-            <Sparkles className="w-4 h-4 text-fancyPink animate-pulse" /> Merchant Portal Sign In
+            <Sparkles className="w-4 h-4 text-fancyPink animate-pulse" /> O-Pay Personal Sign In
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Welcome Back
@@ -127,7 +127,7 @@ export default function Login() {
           {/* Footer Link */}
           <div className="text-center mt-6 pt-6 border-t border-purple-500/20">
             <p className="text-sm text-purple-200/70">
-              Don't have a merchant account?{' '}
+              Don't have an O-Pay Personal account?{' '}
               <Link to="/register" className="text-pink-400 font-extrabold hover:text-pink-300 hover:underline">
                 Create Account
               </Link>

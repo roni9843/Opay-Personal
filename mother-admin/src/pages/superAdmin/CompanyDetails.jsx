@@ -105,7 +105,7 @@ export default function CompanyDetails() {
   };
 
   const handleDeleteUser = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE merchant company "${details?.company?.companyName}"? This action cannot be undone.`);
+    const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE O-Pay Personal company "${details?.company?.companyName}"? This action cannot be undone.`);
     if (!confirmDelete) return;
 
     try {
@@ -118,7 +118,7 @@ export default function CompanyDetails() {
   };
 
   if (loading) {
-    return <div className="text-purple-300 text-center py-12">Loading merchant company details...</div>;
+    return <div className="text-purple-300 text-center py-12">Loading O-Pay Personal company details...</div>;
   }
 
   if (!details) {
@@ -146,7 +146,7 @@ export default function CompanyDetails() {
           <div>
             <h2 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
               <Building2 className="w-7 h-7 text-fancyPink" />
-              {company.companyName || 'Merchant Details'}
+              {company.companyName || 'O-Pay Personal Details'}
             </h2>
             <p className="text-xs text-purple-200/70 mt-0.5">
               Owner: <strong className="text-white">{company.name}</strong> ({company.email})
@@ -190,7 +190,7 @@ export default function CompanyDetails() {
           <div>
             <h4 className="text-lg font-extrabold text-rose-300 uppercase tracking-wide">ACCOUNT SUSPENDED BY SUPER ADMIN</h4>
             <p className="text-xs text-rose-200/90 mt-0.5 font-medium">
-              This merchant user is currently suspended. Access to their merchant dashboard is blocked.
+              This O-Pay Personal user is currently suspended. Access to their dashboard is blocked.
             </p>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function CompanyDetails() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Merchant Info */}
+        {/* O-Pay Personal Info */}
         <div className="fancy-card p-6 rounded-3xl border border-purple-500/20">
           <h3 className="text-sm font-extrabold text-white mb-3 flex items-center gap-2">
             <User className="w-4 h-4 text-fancyPink" /> Owner Contact Profile

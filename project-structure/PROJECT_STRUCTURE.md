@@ -1,7 +1,7 @@
 # 🚀 Opay-Personal System Architecture & Project Structure
 
 ## 📌 Project Overview
-`Opay-personal` is an automated payment gateway platform designed to allow companies and merchants to automatically receive, parse, and verify mobile banking payments (bKash, Nagad, Rocket, Upay - Personal & Agent) via an Android Native App paired with a Node.js Express backend and React (Vite) frontend.
+`Opay-personal` is an automated payment gateway platform designed to allow companies and users to automatically receive, parse, and verify mobile banking payments (bKash, Nagad, Rocket, Upay - Personal & Agent) via an Android Native App paired with a Node.js Express backend and React (Vite) frontend.
 
 ---
 
@@ -13,7 +13,7 @@
    - Manage Company accounts and manual subscription extensions.
    - Global system metrics and real-time logs.
 
-2. **Company Owner (Merchant / Business Owner)**:
+2. **Company Owner (O-Pay Personal User / Business Owner)**:
    - Purchase and manage subscription plan.
    - Create **Agent** sub-accounts for staff.
    - Register and manage Android Devices.
@@ -93,7 +93,7 @@
     │   │   │   ├── Packages.jsx  <-- Create/edit subscription packages
     │   │   │   └── Companies.jsx <-- View all company owners
     │   │   ├── company/
-    │   │   │   ├── Overview.jsx  <-- Main merchant dashboard
+    │   │   │   ├── Overview.jsx  <-- Main O-Pay Personal dashboard
     │   │   │   ├── Agents.jsx    <-- Create & manage agent accounts
     │   │   │   ├── Devices.jsx   <-- Register & view active devices
     │   │   │   ├── PaymentMethods.jsx <-- Manage bKash/Nagad SIMs
@@ -126,7 +126,7 @@ Content-Type: application/json
 {
   "amount": 500,
   "customerRef": "USER_9988",
-  "callbackUrl": "https://merchant.com/api/payment-callback"
+  "callbackUrl": "https://opay-personal.com/api/payment-callback"
 }
 ```
 

@@ -134,7 +134,7 @@ export default function PaymentPage() {
             TrxID: {successData.trxID || successData.trxid}
           </div>
           {successData.successRedirectUrl && (
-            <p className="text-[11px] text-indigo-400 animate-pulse">Redirecting back to merchant website...</p>
+            <p className="text-[11px] text-indigo-400 animate-pulse">Redirecting back to website...</p>
           )}
         </div>
       </div>

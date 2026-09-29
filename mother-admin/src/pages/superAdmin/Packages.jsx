@@ -16,6 +16,9 @@ export default function Packages() {
     maxAdminDevices: 2,
     maxAgents: 3,
     maxDevicesPerAgent: 2,
+    freeSmsCount: 1000,
+    chargeType: 'percentage',
+    chargeValue: 1.5,
     featuresStr: 'Realtime SMS Sync, Webhook Callbacks, 24/7 Socket Listener',
   });
 
@@ -45,6 +48,9 @@ export default function Packages() {
         maxAdminDevices: pkg.maxAdminDevices || 1,
         maxAgents: pkg.maxAgents || 1,
         maxDevicesPerAgent: pkg.maxDevicesPerAgent || 1,
+        freeSmsCount: pkg.freeSmsCount !== undefined ? pkg.freeSmsCount : 1000,
+        chargeType: pkg.chargeType || 'percentage',
+        chargeValue: pkg.chargeValue !== undefined ? pkg.chargeValue : 0,
         featuresStr: pkg.features ? pkg.features.join(', ') : '',
       });
     } else {
@@ -57,6 +63,9 @@ export default function Packages() {
         maxAdminDevices: 2,
         maxAgents: 3,
         maxDevicesPerAgent: 2,
+        freeSmsCount: 1000,
+        chargeType: 'percentage',
+        chargeValue: 1.5,
         featuresStr: 'Realtime SMS Sync, Webhook Callbacks, 24/7 Socket Listener',
       });
     }
@@ -183,6 +192,16 @@ export default function Packages() {
                           <span>Devices per Agent:</span>
                           <strong className="text-cyan-400 font-semibold">{devsPerAgent} Device/Agent</strong>
                         </div>
+                        <div className="flex justify-between items-center">
+                          <span>Free SMS Quota:</span>
+                          <strong className="text-amber-300 font-semibold">{pkg.freeSmsCount !== undefined ? pkg.freeSmsCount : 1000} SMS</strong>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span>Per Trx Charge:</span>
+                          <strong className="text-emerald-300 font-semibold">
+                            {pkg.chargeValue || 0} {pkg.chargeType === 'flat' ? 'BDT' : '%'}
+                          </strong>
+                        </div>
                         <div className="flex justify-between items-center pt-1.5 border-t border-white/10 text-[11px]">
                           <span className="text-slate-400">Total Devices:</span>
                           <strong className="text-white font-bold">{totalDevices} Devices</strong>
@@ -273,6 +292,54 @@ export default function Packages() {
                     onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-indigo-500"
                   />
+                </div>
+              </div>
+
+              {/* SMS Limit & Per Transaction Charge Config */}
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                <p className="font-bold text-amber-300 text-[11px] uppercase tracking-wider">SMS Quota & Transaction Fee Setup</p>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Free SMS Count</label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={formData.freeSmsCount}
+                      onChange={(e) => setFormData({ ...formData, freeSmsCount: Number(e.target.value) })}
+                      placeholder="e.g. 1000"
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Charge Type</label>
+                    <select
+                      value={formData.chargeType}
+                      onChange={(e) => setFormData({ ...formData, chargeType: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-[#180f33] border border-white/10 text-white focus:outline-none focus:border-indigo-500 font-semibold"
+                    >
+                      <option value="percentage">Percentage (%)</option>
+                      <option value="flat">Fixed / Flat (BDT)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">
+                      Charge Rate ({formData.chargeType === 'flat' ? '৳' : '%'})
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required
+                      value={formData.chargeValue}
+                      onChange={(e) => setFormData({ ...formData, chargeValue: Number(e.target.value) })}
+                      placeholder={formData.chargeType === 'flat' ? 'e.g. 5 BDT' : 'e.g. 1.5%'}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
                 </div>
               </div>
 

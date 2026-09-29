@@ -25,7 +25,7 @@ export default function Devices() {
       status: 'online',
       simSlots: [
         { slot: 1, operator: 'Rocket Personal', number: '01811223344', simType: 'SIM 1' },
-        { slot: 2, operator: 'Bkash Merchant', number: '01899887766', simType: 'SIM 2' },
+        { slot: 2, operator: 'Bkash O-Pay Personal', number: '01899887766', simType: 'SIM 2' },
       ],
       lastSync: '1 minute ago'
     }

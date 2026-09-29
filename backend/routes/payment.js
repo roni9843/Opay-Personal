@@ -13,7 +13,7 @@ const OPAY_BUSINESS_API_URL = process.env.OPAY_BUSINESS_API_URL || 'https://api.
 
 /**
  * GET /api/payment/public-packages
- * Public / Protected for Merchants: List all active subscription packages available for purchase
+ * Public / Protected for O-Pay Personal: List all active subscription packages available for purchase
  */
 router.get('/public-packages', async (req, res) => {
   try {
@@ -26,7 +26,7 @@ router.get('/public-packages', async (req, res) => {
 
 /**
  * POST /api/payment/purchase-package
- * Protected: Merchant initiates package purchase via OraclePay Business Gateway
+ * Protected: Company Owner initiates package purchase via OraclePay Business Gateway
  */
 router.post('/purchase-package', protect, authorize('company_owner'), async (req, res) => {
   try {

@@ -67,7 +67,7 @@ export default function Layout() {
                 ACCOUNT SUSPENDED BY SUPER ADMIN
               </h1>
               <p className="text-xs md:text-sm text-rose-200/90 font-medium leading-relaxed">
-                This merchant user is currently suspended. Access to their merchant dashboard is blocked.
+                This opay-personal user is currently suspended. Access to their opay-personal dashboard is blocked.
               </p>
             </div>
 
@@ -101,7 +101,7 @@ export default function Layout() {
                 <span>ACCOUNT SUSPENDED BY SUPER ADMIN</span>
               </div>
               <p className="text-sm font-bold text-white">
-                This merchant user is currently suspended. Access to their merchant dashboard is blocked.
+                This opay-personal user is currently suspended. Access to their opay-personal dashboard is blocked.
               </p>
             </div>
           )}

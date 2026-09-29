@@ -36,7 +36,7 @@ export default function CompanyDashboard() {
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-400">Loading Merchant Analytics...</div>;
+    return <div className="p-8 text-center text-slate-400">Loading O-Pay Personal Analytics...</div>;
   }
 
   const sub = stats?.subscription;

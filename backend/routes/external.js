@@ -100,7 +100,7 @@ router.get('/checkout/resolve/:sessionToken', async (req, res) => {
           customerRef: session.customerRef,
           trxID: session.trxID,
           paymentMethod: session.paymentMethod,
-          companyName: session.companyOwner?.companyName || 'Opay Merchant',
+          companyName: session.companyOwner?.companyName || 'Opay Personal',
           successRedirectUrl: session.successRedirectUrl,
         },
       });
@@ -125,7 +125,7 @@ router.get('/checkout/resolve/:sessionToken', async (req, res) => {
         sessionToken: session.sessionToken,
         amount: session.amount,
         customerRef: session.customerRef,
-        companyName: session.companyOwner?.companyName || 'Opay Merchant',
+        companyName: session.companyOwner?.companyName || 'Opay Personal',
         expiresAt: session.expiresAt,
         paymentMethods: methods,
       },
